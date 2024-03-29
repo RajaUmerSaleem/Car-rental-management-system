@@ -1,0 +1,1093 @@
+#include<iostream>
+#include <windows.h>
+#include<string>
+#include <cstdlib>
+#include<fstream> 
+#include<cstddef>
+#include <ctime> 
+using namespace std;
+ void cheader()
+{
+    cout<<endl;	
+    cout << "\t\t\t**---------------------------------------**" << endl;
+    cout << "\t\t\t||         CAR RENTAL MENU SYSTEM        ||" << endl;
+    cout << "\t\t\t||           ENJOY OUR SERVICE           ||" << endl;
+    cout << "\t\t\t**---------------------------------------**" << endl;
+    cout<<endl;
+    cout<<endl;
+}
+ void header()
+{
+    cout<<endl;	
+    cout << "\t\t\t**---------------------------------------**" << endl;
+    cout << "\t\t\t||         CAR RENTAL MENU SYSTEM        ||" << endl;
+    cout << "\t\t\t||              ADMIN PORTAL             ||" << endl;
+    cout << "\t\t\t**---------------------------------------**" << endl;
+    cout<<endl;
+    cout<<endl;
+}
+void loading()                
+{
+cout<<"\t\t\t\tLoading..."<<endl;
+char x = 219;
+cout<<endl;
+cout<<"\t\t\t";
+for(int i=0;i<=35;i++)
+{
+	cout<<x;
+	Sleep(75);
+ } 
+}
+struct car{
+	string name,modle,color,reg;
+	int price,speed;
+	bool rent;	
+};
+struct client{
+	string car,name,cnic,date;
+	int price,bill;
+	
+};
+struct pass{
+string pass,id;
+}; 
+struct report{
+	string carname,date;
+	bool status;
+	int ammount,rcount,repair;
+};
+int l; 
+void input(car *ptr,int size,fstream &carr)
+{
+    l=0;
+ 	int i=0;
+		int n; 
+	char decision='y';
+    while(decision!='n'&&i<size)
+    {
+    cout<<"\t\t\tis you want add a car(y/n)";
+	cin>>decision;
+	if(decision=='y')
+	{
+	cout<<"\n\t\t\tEnter Car name:";
+	cin>>ptr[i].name;
+	cout<<endl<<"\t\t\tEnter Car model:";
+	cin.ignore();
+	cin>>ptr[i].modle;
+	cout<<endl<<"\t\t\tEnter Car color:";
+	cin.ignore();
+	cin>>ptr[i].color;
+	cout<<endl<<"\t\t\tEnter Car registration no.:";
+	cin.ignore();
+	cin>>ptr[i].reg;
+	cout<<endl<<"\t\t\tEnter Car price:";
+	cin>>ptr[i].price;
+	cout<<endl<<"\t\t\tEnter Car speed:";
+	cin>>ptr[i].speed;
+    cout<<"\t\t\t1: Rented"<<endl;
+    cout<<"\t\t\t2: available"<<endl;
+    cin>>n;
+	switch(n)
+	{
+		case 1:
+		ptr[i].rent=true;
+		break;
+		case 2:
+		ptr[i].rent=false;
+		break;
+		default:
+		cout<<"\t\t\tChoose right option"<<endl;	
+	}
+	l++;
+    }	
+    i++;
+    }
+    carr.open("carrecord.txt",ios::app|ios::out);
+	for(int i=0;i<l;i++)
+	{
+		carr<<ptr[i].name<<" "<<ptr[i].modle<<" "<<ptr[i].color<<" "<<ptr[i].reg<<" "<<ptr[i].price<<" "<<ptr[i].speed<<" "<<ptr[i].rent<<endl;
+	}
+	carr.close();
+}
+int filelength;
+int filelengthc;
+void lenghtcount(fstream &carr)
+{
+	string word;
+  carr.open("carrecord.txt",ios::in);
+ while(true)
+ {
+ 	getline(carr,word);
+ 	if(carr.eof())
+  	break;
+  	filelength++;
+ }
+ carr.close();
+}
+void lenghtcountc(fstream &carr)
+{
+	string word;
+  carr.open("cusData.txt",ios::in);
+ while(true)
+ {
+ 	getline(carr,word);
+ 	if(carr.eof())
+  	break;
+  	filelengthc++;
+ }
+ carr.close();
+}
+void filearray(car *ptc,fstream &file)
+{
+file.open("carrecord.txt",ios::in);
+for(int i=0;i<filelength;i++)
+{
+file>>ptc[i].name>>ptc[i].modle>>ptc[i].color>>ptc[i].reg>>ptc[i].price>>ptc[i].speed>>ptc[i].rent;
+	if(file.eof())
+  	break;
+}
+file.close();
+}
+void cusarray(client *pcc,fstream &file)
+{
+	
+file.open("cusData.txt",ios::in);
+for(int i=0;i<filelengthc;i++)
+{
+	string n1,n2,cic,day,month,date,time,yr;
+	int pri;
+file>>pcc[i].car>>n1>>n2>>cic>>pri>>day>>month>>date>>time>>yr;
+pcc[i].name=n1+" "+n2;
+pcc[i].cnic=cic;
+pcc[i].bill=pri;
+pcc[i].date=day+" "+month+" "+date+" "+time+" "+yr;
+if(file.eof())
+  	break;
+}
+file.close();
+}
+void cns(report *pcc,fstream &file,fstream &car)
+{
+time_t currentTime = time(NULL);
+	string cname,modle,color,reg;
+	int price,speed;
+	bool rent;
+	int counter=0;
+	int i=0;
+	string carname, n1,n2,cic,day,month,date,time,yr;
+    int pri;
+car.open("carrecord.txt",ios::in);
+while(car>>cname>>modle>>color>>reg>>price>>speed>>rent&&i<filelength)
+{
+	string currentDate = ctime(&currentTime);
+	pcc[i].carname=cname;
+	pcc[i].status=rent;
+	pcc[i].rcount=0;
+	counter=0;
+	pcc[i].repair=0;
+	pcc[i].ammount=0;
+	pcc[i].date=" ";
+	if(car.eof())
+  	break;
+file.open("cusData.txt",ios::in);	
+while(file>>carname>>n1>>n2>>cic>>pri>>day>>month>>date>>time>>yr)
+{
+if(carname==cname)
+{
+counter++;
+pcc[i].ammount=pcc[i].ammount+pri;
+pcc[i].rcount=counter;
+pcc[i].repair=counter/4;
+if(counter%4==0)
+{
+pcc[i].date=currentDate;	
+}
+}
+if(file.eof())
+  	break;
+}
+file.close();
+++i;
+}
+car.close();
+
+cout<<"car\t\tstatus\t\tRevenue\t\tRent,s time\t\tLast maintenances\tLast maintenance date"<<endl;
+cout<<"==========================================================================================================="<<endl;
+  for (int k = 0; k < i; k++) 
+  {
+        cout << pcc[k].carname << "\t\t";
+        if (pcc[k].status == false)
+		 {
+            cout << "Available";
+        } 
+		else 
+		{
+            cout << "Rented";
+        }
+        cout << "\t\t" << pcc[k].ammount << "\t\t" << pcc[k].rcount << "\t\t" << pcc[k].repair << "\t\t" << pcc[k].date << endl;
+}
+cout<<"==========================================================================================================="<<endl;
+}
+void cusreport(fstream &file)
+{
+	system("CLS");
+    cout<<"\t\t\t-------------------"<<endl;
+	cout<<"\t\t\t  Previous Record"<<endl;
+	cout<<"\t\t\t-------------------"<<endl;
+    cout<<endl;
+    cout<<endl;
+	bool find = false;
+	int totalSpent=0;
+	string recus,reid;
+		string carn,n1,n2,cic,day,month,date,time,yr;
+	int pri;
+	string name,cnic,d;
+	int bill;
+cout<<"\t\t\tYou can get customer rental history and\n\t\t\ttotal spending till now by providing us\n\t\t\tyour Name(two word name only) and  CNIC"<<endl;
+cout<<"\n\t\t\tName:";
+cin.ignore();
+getline(cin,recus);
+cout<<"\t\t\tCNIC:";
+getline(cin,reid);
+file.open("cusData.txt",ios::in);
+while(file>>carn>>n1>>n2>>cic>>pri>>day>>month>>date>>time>>yr)
+{	
+if(recus==n1+" "+n2&&reid==cic)
+{
+	find = true;
+name=n1+" "+n2;
+cnic=cic;
+bill=pri;
+d=day+" "+month+" "+date+" "+time+" "+yr;
+	    cout<<"\t\t\tRented car: "<<carn<<endl;
+	    cout<<"\t\t\tCustomer bill: "<<bill<<endl;
+	    cout<<"\t\t\tCustomer date: "<<d<<endl;
+	    totalSpent+=bill;
+}
+if(file.eof())
+	break;
+}
+if(find == false)
+{
+cout<<"\t\t\tRecord not found"<<endl;
+}
+else
+{
+	cout<<"\t\t\tYour total spending till now: "<<totalSpent<<endl;
+}
+file.close();
+system("PAUSE");
+}
+void ocusreport(fstream &file)
+{
+	int totalP=0;
+	string carn,n1,n2,cic,day,month,date,time,yr;
+	int pri;
+	string name,cnic,d;
+	int bill=0;
+file.open("cusData.txt",ios::in);
+cout<<"Customer\tRented Car\t\tDate\t\t\tRenvue"<<endl;
+cout<<"=================================================================================="<<endl;
+while(file>>carn>>n1>>n2>>cic>>pri>>day>>month>>date>>time>>yr)
+{	
+name=n1+" "+n2;
+cnic=cic;
+bill=pri;
+d=day+" "+month+" "+date+" "+time+" "+yr;
+        cout<<name<<"\t"<<carn<<"\t\t"<<d<<"\t\t"<<bill<<endl;
+	    totalP+=bill;
+if(file.eof())
+  	break;
+}
+cout<<"=================================================================================="<<endl;
+
+	cout<<" Total Renevue till now: "<<totalP<<endl;
+cout<<"=================================================================================="<<endl;
+
+file.close();
+}
+void avalaible(car *ptr)
+{
+	system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+	cout<<"\t\t\t--------------"<<endl;
+	cout<<"\t\t\tAvailable Cars"<<endl;
+	cout<<"\t\t\t--------------"<<endl;
+	for(int i=0;i<filelength;i++){
+		if (ptr[i].rent==false){
+	cout<<"\t\t\t"<<i+1<<": Car name:"<<ptr[i].name<<endl;
+	}
+}
+}
+void rented(car *ptr){
+		system("CLS");
+  	cout<<"\t\t\t--------------"<<endl;
+	cout<<"\t\t\t Rented Cars  "<<endl;
+	cout<<"\t\t\t--------------"<<endl;
+    cout<<endl;
+    cout<<endl;
+
+		for(int i=0;i<filelength;i++)
+	{
+		if (ptr[i].rent==true)
+		{
+	cout<<"\t\t\t"<<i+1<<": Car name:"<<ptr[i].name<<endl;
+	}
+	}
+}
+void retur(car *ptc,string rcar)
+{
+	for(int i=0;i<filelength;i++)
+	{
+		if(ptc[i].name==rcar)
+		{
+		ptc[i].rent = false;
+		cout<<"\n\t\t\t"<<ptc[i].name<<"has returned"<<endl;
+		break;	
+		}
+	}
+}
+bool pkc = false;
+void output(car *ptr)
+{
+	
+	cout<<"\t\t\t... Registor Cars ......"<<endl;
+		for(int i=0;i<filelength;i++)
+	{
+		cout<<"\t\t\t\t"<<i+1<<endl;
+	cout<<"\t\t\tCar name:"<<ptr[i].name<<endl;	
+	cout<<"\t\t\tCar model:"<<ptr[i].modle<<endl;
+	cout<<"\t\t\tCar color:"<<ptr[i].color<<endl;
+	cout<<"\t\t\tCar registration no:"<<ptr[i].reg<<endl;
+	cout<<"\t\t\tCar price: Rs"<<ptr[i].price<<endl;	
+	cout<<"\t\t\tCar speed:"<<ptr[i].speed<<"/mph"<<endl;	
+	if (ptr[i].rent==true)
+	cout<<"\t\t\tCar status: Rented"<<endl;	
+	else
+	cout<<"\t\t\tCar status: Availabe"<<endl;
+	}
+	cout<<"\t\t\t......................."<<endl;
+}
+void outputc(car *ptr)
+{
+	
+	cout<<"\t\t\t.....Detail Avaialable Cars......"<<endl;
+		for(int i=0;i<filelength;i++)
+	{
+		if (ptr[i].rent== false)
+		
+{
+	cout<<"\t\t\t\t("<<i+1<<")"<<endl;
+		cout<<"\t\t\tCar name:"<<ptr[i].name<<endl;	
+	cout<<"\t\t\tCar model:"<<ptr[i].modle<<endl;
+	cout<<"\t\t\tCar color:"<<ptr[i].color<<endl;
+	cout<<"\t\t\tCar registration no:"<<ptr[i].reg<<endl;
+	cout<<"\t\t\tCar price: Rs"<<ptr[i].price<<endl;	
+	cout<<"\t\t\tCar speed:"<<ptr[i].speed<<"/mph"<<endl;	
+}
+	}
+	cout<<"\t\t\t................................"<<endl;
+}
+void checkaccount(fstream &file)
+{
+	int account;
+	string passid,pword,extra;
+	string cpassid,cpword;
+		  	cin.ignore();
+		  	cout<<"\t\t\tEnter Id: ";
+		  	getline(cin,passid);
+		  	cout<<endl<<"\t\t\tEnter Password: ";
+		  	getline(cin,pword);
+		    file.open("password.txt",ios::in);
+		  	while(file>>cpassid>>extra>>cpword)
+		  	{
+		  		if (cpassid+" "+extra==passid&&cpword==pword)
+		  		{
+		          pkc = true;
+				  }
+			  }
+		  	file.close();		  	
+}
+bool createaccount(fstream &file)
+{
+	int account;
+	string passid,pword;
+		  	cin.ignore();
+		  	cout<<"\t\t\tEnter id(two word first-last name): ";
+		  	getline(cin,passid);
+		  	cout<<"\n\n\t\t\tEnter password: ";
+		    getline(cin,pword);
+		    file.open("password.txt",ios::app|ios::out);
+		  	file<<passid<<" "<<pword<<" "<<endl;
+		  	file.close();
+		  	cout<<endl<<endl;
+		  	cout<<"\t\t\tCongratutions! Account Created"<<endl;
+		  checkaccount(file);	
+}
+void menu()
+{
+    system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    cout<<"\t\t\t 1:Rent a Car"<<endl;
+    cout<<"\t\t\t 2:Return a Car"<<endl;
+    cout<<"\t\t\t 3:View Available Cars"<<endl;
+    cout<<"\t\t\t 4:View Total Bill"<<endl;
+    cout<<"\t\t\t 5:Previous Rental Report"<<endl; 
+    cout<<"\t\t\t 6:Logout"<<endl;  
+    cout<<"\t\t\t";
+}
+void omenu()
+{
+	system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    cout<<"\t\t\t 1:Change Password"<<endl;
+    cout<<"\t\t\t 2:View Vailable Cars"<<endl;
+    cout<<"\t\t\t 3:Add  New Car"<<endl;
+    cout<<"\t\t\t 4:Remove a Car"<<endl;
+    cout<<"\t\t\t 5:Update a Car"<<endl;
+    cout<<"\t\t\t 6:View Customer data"<<endl;
+    cout<<"\t\t\t 7:Add Customer"<<endl;
+    cout<<"\t\t\t 8:Remove Customer"<<endl;
+    cout<<"\t\t\t 9:Update Customer data"<<endl;
+    cout<<"\t\t\t 10:Check Renevue Report"<<endl;
+    cout<<"\t\t\t 11:Check Inventry Report"<<endl;
+    cout<<"\t\t\t 12:Logout"<<endl;  
+    cout<<"\t\t\t";
+}
+int cbill;
+void rent( car *ptr, client *pc,fstream &cus)
+{
+	time_t currentTime = time(NULL); 
+	string currentDate = ctime(&currentTime);
+	cout<<"\n\n";	
+	int cn,t;
+	cout<<"\t\t\tCar No: ";
+	cin>>cn;
+	pc[cn-1].car=ptr[cn-1].name;
+	cout<<"\n\t\t\tHours..(must be less than 5 Hours): ";
+	cin>>t;
+	cin.ignore();
+	cout<<"\n\t\t\tEnter  Name(two word first-last name): ";
+	getline(cin,pc[cn-1].name);
+	cout<<endl<<"\t\t\tEnter  CNIC(without spaces): ";
+	getline(cin,pc[cn-1].cnic);
+	cout<<endl<<"\t\t\tPay  bill "<<t*ptr[cn-1].price;
+	cout<<endl<<"Note: If You Enter  less than rent of car,It will be not rented "<<endl; 
+	cin>>pc[cn-1].price;
+	pc[cn-1].date = currentDate;
+	cbill+=t*ptr[cn-1].price;
+ if(pc[cn-1].price == t*ptr[cn-1].price)
+   {
+    if(t<=5 && ptr[cn-1].rent == false)
+	{
+	system("CLS");
+	cheader(); 
+	cout<<"\n\n\n";	
+	cout<<"\t\t\t---------------------------"<<endl;
+	cout<<"\t\t\t\tRecipt"<<endl;
+	cout<<"\t\t\t---------------------------"<<endl;
+cout<<"\t\t\t"<<ptr[cn-1].name<<" has rented for "<<t<<"/hours"<<endl;
+cout<<"\t\t\t Car Reg.NO: "<<ptr[cn-1].reg<<endl;
+cout<<"\t\t\t Car Model: "<<ptr[cn-1].modle<<endl;
+         cout<<"\t\t\t Car color: "<<ptr[cn-1].color<<endl;
+   cout<<"\t\t\t----------------------------"<<endl;
+cout<<"\t\t\t Bill: "<<pc[cn-1].price<<endl;
+   cout<<"\t\t\t----------------------------"<<endl;
+system("PAUSE");
+ptr[cn-1].rent = true;
+pc[cn-1].bill=pc[cn-1].price;
+cus.open("cusData.txt",ios::app|ios::out);
+{
+ cus<<pc[cn-1].car<<" "<<pc[cn-1].name<<" "<<pc[cn-1].cnic<<" "<<pc[cn-1].bill<<" "<<pc[cn-1].date;
+}
+cus.close();
+delete []pc;
+}
+else if(cn>5)
+cout<<"\t\t\tYou are choosing invalid option"<<endl;
+else
+  cout<<"\t\t\tYou must rent a avaible car for maximum five hours"<<endl;
+}
+else 
+cout<<"\t\t\tEnter right amount"<<endl;
+}
+void addcustomer(client *ptr,int size,fstream &cus)
+{		
+ l=0;
+ 	int i=0;
+	char decision='y';
+    while(decision!='n'&&i<size)
+    {
+    	time_t currentTime = time(NULL); 
+	string currentDate = ctime(&currentTime);
+    cout<<"\t\t\tAdd a Custmer(y/n) ";
+	cin>>decision;
+	if(decision=='y')
+	{
+	cout<<"\n\t\t\tEnter Rented Car name: ";
+	cin>>ptr[i].car;
+	cin.ignore();
+	cout<<"\n\t\t\tEnter customer name ";
+	getline(cin,ptr[i].name);
+    cout<<"\n\t\t\tEnter customer CNIC ";
+	getline(cin,ptr[i].cnic);
+	cout<<endl<<"t\t\tEnter Customer Bill: ";
+	cin>>ptr[i].bill;
+	ptr[i].date=currentDate;
+	l++;
+    }
+	i++;
+    }
+	cus.open("cusData.txt",ios::app|ios::out);
+	for(int i=0;i<l;i++)
+{
+ cus<<ptr[i].car<<" "<<ptr[i].name<<" "<<ptr[i].cnic<<" "<<ptr[i].bill<<" "<<ptr[i].date;
+ if(cus.eof())
+  	break;
+}
+cus.close();
+delete []ptr;
+cout<<"\n\t\t\tCustomer Added!"<<endl;
+}
+void showCustomer(client *pcc)
+{
+	    cout<<"\t\t\t---------Customer Record-------"<<endl;
+	for(int i=0;i<filelengthc;i++)
+	{
+	    cout<<"\t\t\t-------------------------------"<<endl;
+		cout<<"\t\t\tRented car: "<<pcc[i].car<<endl;
+		cout<<"\t\t\tCustomer name: "<<pcc[i].name<<endl;
+		cout<<"\t\t\tCustomer cnic: "<<pcc[i].cnic<<endl;
+	    cout<<"\t\t\tCustomer bill: "<<pcc[i].bill<<endl;
+	    cout<<"\t\t\tCustomer date: "<<pcc[i].date<<endl;	
+	    cout<<"\t\t\t-------------------------------"<<endl;
+	}
+}
+void updaterecord(car *ptc,fstream &file)
+{
+	fstream file1;
+	
+file.open("carrecord.txt",ios::in);
+file1.open("item1.txt",ios::out);
+for(int i=0;i<filelength;i++)
+{
+	{
+		file1<<ptc[i].name<<" "<<ptc[i].modle<<" "<<ptc[i].color<<" "<<ptc[i].reg<<" "<<ptc[i].price<<" "<<ptc[i].speed<<" "<<ptc[i].rent<<endl;
+	}
+if(file.eof())
+break;
+	}
+file.close();
+file1.close();
+  remove("carrecord.txt"); 
+  rename("item1.txt","carrecord.txt");
+  cout<<"Updated records"<<endl;
+}	
+void deletecar(car *ptc,fstream &file)
+{
+	string carname;
+	output(ptc);
+	cout<<"\t\t\tEnter car,s name, You want to delete: ";
+	cin>>carname;
+	fstream file1;
+file.open("carrecord.txt",ios::in);
+file1.open("item1.txt",ios::out);
+cout<<endl;
+for(int i=0;i<filelength;i++)
+{
+	if(carname!=ptc[i].name)
+	{
+    {
+		file1<<ptc[i].name<<" "<<ptc[i].modle<<" "<<ptc[i].color<<" "<<ptc[i].reg<<" "<<ptc[i].price<<" "<<ptc[i].speed<<" "<<ptc[i].rent<<endl;
+	}
+if(file.eof())
+break;
+	}
+}
+file.close();
+file1.close();
+  remove("carrecord.txt"); 
+  rename("item1.txt","carrecord.txt");
+  cout<<"Updated records"<<endl;
+}	
+void deletecus(client *pcc,fstream &file)
+{
+	string cusname;
+	cout<<"Enter customer,s name, You want to remove"<<endl;
+	cin.ignore();
+	getline(cin,cusname);
+	fstream file1;
+file.open("cusData.txt",ios::in);
+if (!file.is_open()) {
+    cout << "Error opening file!" << endl;
+    return;
+}
+file1.open("item2.txt",ios::out);
+for(int i=0;i<filelengthc;i++)
+{
+	if(cusname!=pcc[i].name)
+    {
+	file1<<pcc[i].car<<" "<<pcc[i].name<<" "<<pcc[i].cnic<<" "<<pcc[i].bill<<" "<<pcc[i].date<<endl;
+	}
+}
+file.close();
+file1.close();
+  remove("cusData.txt"); 
+  rename("item2.txt","cusData.txt");
+  cout<<"Updated records"<<endl;
+}	
+void modifycar(car *ptc,fstream &file)
+{
+	string carname;
+	output(ptc);
+	cout<<"Enter car,s name, You want to update"<<endl;
+	cin>>carname;
+	fstream file1;
+file.open("carrecord.txt",ios::in);
+file1.open("item1.txt",ios::out);
+for(int i=0;i<filelength;i++)
+{
+	if(carname!=ptc[i].name)
+    {
+		file1<<ptc[i].name<<" "<<ptc[i].modle<<" "<<ptc[i].color<<" "<<ptc[i].reg<<" "<<ptc[i].price<<" "<<ptc[i].speed<<" "<<ptc[i].rent<<endl;
+	}
+	else
+	{
+		int n=0;
+	  cout<<"Enter Car name:"<<endl;
+	  cin>>	ptc[i].name;
+	  cout<<endl;
+	  cout<<"Enter Car model:"<<endl;
+	  cin>>	ptc[i].modle;
+	  cout<<endl;
+	  cout<<"Enter Car color:"<<endl;
+	  cin>>	ptc[i].color;
+	  cout<<endl;
+	  cout<<"Enter Car reg:"<<endl;
+	  cin>>	ptc[i].reg;
+	  cout<<endl;
+	  cout<<"Enter Car price/hour:"<<endl;
+	  cin>>	ptc[i].price;
+	  cout<<endl;
+	  cout<<"Enter Car speed:"<<endl;
+	  cin>>	ptc[i].speed;
+	  cout<<endl;
+	  cout<<"Enter Car status:"<<endl;
+	   cout<<"1: Rented"<<endl;
+    cout<<"2: available"<<endl;
+    cin>>n;
+	switch(n)
+	{
+		case 1:
+		ptc[i].rent=true;
+		break;
+		case 2:
+		ptc[i].rent=false;
+		break;
+		default:
+		cout<<"choose right option"<<endl;	
+	}
+	  file1<<ptc[i].name<<" "<<ptc[i].modle<<" "<<ptc[i].color<<" "<<ptc[i].reg<<" "<<ptc[i].price<<" "<<ptc[i].speed<<" "<<ptc[i].rent<<endl;
+	}
+if(file.eof())
+break;
+	}
+
+file.close();
+file1.close();
+  remove("carrecord.txt"); 
+  rename("item1.txt","carrecord.txt");
+  cout<<"Updated records"<<endl;
+}
+void modifycus(fstream &file)
+{
+	time_t currentTime = time(NULL); 
+	string carname, n1,n2,cic,day,month,date,time,yr;
+int pri;
+string newn,ncic,ndate;
+int nbill;
+	string cusname;
+	cin.ignore();
+	cout<<"\t\t\tEnter customer,s name, to modify its data: ";
+	getline(cin,cusname);
+	fstream file1;
+file.open("cusData.txt",ios::in);
+file1.open("item1.txt",ios::out);
+for(int i=0;i<filelengthc;i++)
+{
+file>>carname>>n1>>n2>>cic>>pri>>day>>month>>date>>time>>yr;
+	if(cusname!=n1+" "+n2)
+    {
+     file1<<carname<<" "<<n1<<" "<<n2<<" "<<cic<<" "<<pri<<" "<<day<<" "<<month<<" "<<date<<" "<<time<<" "<<yr<<endl;
+	}
+	else
+	{
+	string currentDate = ctime(&currentTime);
+	cin.ignore();
+	cout<<"\n\t\t\tEnter Rented Car name:";
+	cin>>carname;
+	cin.ignore();
+	cout<<"\n\t\t\tEnter customer name(two word name): ";
+	getline(cin,newn);
+    cout<<"\n\t\t\tEnter customer CNIC: ";
+	getline(cin,ncic);
+	cout<<endl<<"\n\t\t\tEnter Customer Bill: ";
+	cin>>nbill;
+	ndate=currentDate;
+	file1<<carname<<" "<<newn<<" "<<ncic<<" "<<nbill<<" "<<ndate;
+if(file.eof())
+break;
+	}
+	}
+file.close();
+file1.close();
+  remove("cusData.txt"); 
+  rename("item1.txt","cusData.txt");
+  cout<<"Updated records"<<endl;
+}
+int main(){
+	cheader();
+	loading();
+    string pass, id;
+    int size;
+    string rcar;
+    int choice;
+    cout<<endl;
+    fstream file,carr,cus;
+    client *pc = NULL;
+    car *ptr= NULL;
+    car *ptc= NULL;
+    report *cusc=NULL;
+    client *pcc= NULL;
+    filelength=0;
+    lenghtcount(carr);
+    ptc=new car[filelength];
+    pc=new client[filelength];
+    filearray(ptc,carr);
+    filelengthc=0;
+    lenghtcountc(cus);
+    pcc = new client[filelengthc];
+    string  oid="ownerM@123";
+    string  opass="OwnerM";
+    string  coid;
+    string  copass;
+    int n; 
+    login:
+    string check;
+	system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    cbill=0;	
+    cout<<"\t\t\tYOU WANT TO LOG IN CAR RENTAL MENU SYSTEM"<< endl;
+    cout<<"\t\t\t 1:Login as CUSTOMER " << endl;
+    cout<<"\t\t\t 2:Login as ADMIN " << endl;
+    cout<<"\t\t\t 3:EXIT " << endl;
+    cout<<"\t\t\t";
+    cin >> n;
+    while(true)
+    {
+	if (n==2)
+	{	
+	reenter:
+	system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+	cout<<"\t\t\tADMIN ID\n\t\t\tEnter your Id: ";
+	cin>>coid;
+	cout<<"\n\t\t\tEnter your password: ";
+	cin>>copass;
+	if(coid!=oid&&copass!=opass)
+	{
+	cout<<"\t\t\tINCORRECT "<<endl;
+	   goto reenter;
+	}
+cout<<"\n\t\t\tAccess Granted.."<<endl;
+system("PAUSE");
+
+p:
+	omenu();
+	int ac;
+	cin>>ac;
+	switch(ac)
+	{
+		case 1:
+	system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+		cout<<"\t\t\tEnter New ID\n";
+		   cin.ignore();
+		   getline(cin,oid);
+		   cout<<"\t\t\tEnter new Password\n";
+           getline(cin,opass);
+		   cout<<"\t\t\tOK! Password Changed..\n";
+		   system("CLS");
+           cout<<endl;
+           cout<<endl;
+		   goto reenter;	
+			break;
+		case 2 :
+			system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+		avalaible(ptc);	
+    cout<<"\t\t\tView Details (y/n)";
+    char decheck;
+    cin>>decheck;
+    if(decheck=='y')
+    system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+    output(ptc);
+    system("PAUSE");
+    goto p;
+    break;
+	case 3:
+    cout<<endl;
+    system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    cout<<"\t\t\tHow many cars you want to add: ";
+    cin>>size;
+    cout<<endl;
+    pc = new client[size];
+    ptr = new car[size];
+    input(ptr,size,carr); 
+    filelength=0;
+    lenghtcount(carr);
+    delete[] ptr;
+ptc = new car[filelength];
+filearray(ptc,carr);
+system("PAUSE");
+goto p; 
+	break;	
+	case 4:
+		system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+deletecar(ptc,file);
+filelength=0;
+lenghtcount(carr);
+ptc = new car[filelength];
+filearray(ptc,carr);
+system("PAUSE");
+goto p; 
+	break;
+	case 5:
+		system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+	 modifycar(ptc,file);
+	 filelength=0;
+lenghtcount(carr);
+ptc = new car[filelength];
+filearray(ptc,carr);
+system("PAUSE");
+goto p; 
+		break;
+		case 6:
+			system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+filelengthc=0;
+lenghtcountc(cus);
+pcc = new client[filelengthc];
+cout<<filelengthc;
+cusarray(pcc,cus);	
+showCustomer(pcc);
+system("PAUSE");
+goto p; 
+		break;
+	      case 7:
+	      	system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+				cout<<"\t\t\thow many customers you want to add: ";
+    cin>>size;
+    pc = new client[size];
+     addcustomer(pc,size,cus);
+     goto p;
+		break;
+			case 8:
+				system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+				filelengthc=0;
+			lenghtcountc(cus);
+           pcc = new client[filelengthc];
+			cusarray(pcc,cus);	
+		showCustomer(pcc);
+		deletecus(pcc,cus);
+		delete []pcc;
+		break;
+		goto p;
+		case 9:
+			system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+			filelengthc=0;
+           lenghtcountc(cus);
+             pcc = new client[filelengthc];
+				cusarray(pcc,cus);	
+		      showCustomer(pcc);
+			modifycus(cus);
+			goto p;
+			delete []pcc;
+			break;
+			case 10:
+			system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+			ocusreport(cus);
+			system("PAUSE");
+			goto p;
+			break;
+				case 11:
+					system("CLS");
+    header(); 
+    cout<<endl;
+    cout<<endl;
+					filelength=0;
+			lenghtcount(carr);
+			 cusc = new report[filelength];
+			 cns(cusc,cus,carr);
+			 system("PAUSE");
+			 goto p;
+			break;
+			case 12:
+		    goto login;
+			break;		
+	}
+}
+    else if (n==1)
+    { 
+    int cd;
+	system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    cout<<"\t\t\tDear customer!\n\t\t\t1:You want to make account\n\t\t\t2:You want to login\n"<<endl;
+    cin>>cd;
+    switch(cd)
+    {
+    	case 1:
+    		    system("CLS");
+    		     cheader(); 
+    cout<<endl;
+    cout<<endl;
+    	 createaccount(file);
+		 break;
+		 case 2:
+	system("CLS");
+	 cheader(); 
+    cout<<endl;
+    cout<<endl;
+		checkaccount(file);
+		 break;	
+		  	
+	}
+	if (pkc != true)
+	{
+		cout<<"\t\t\tAccess not Granded"<<endl;
+	Sleep(75);
+		break;
+	}
+   system("CLS");
+    cout<<endl;
+    cout<<endl;
+	cout<<"\t\t\tAccess Granded"<<endl;
+	Sleep(75);
+	cusp:
+    menu();
+    cin>>choice; 
+    switch(choice)
+    {
+    case 1:
+    avalaible(ptc);	
+    cout<<"\t\t\tDo you what to view details (y/n)"<<endl;
+    char decheck;
+    cin>>decheck;
+    if(decheck=='y')
+    system("CLS");
+    cout<<endl;
+    cout<<endl;
+    outputc(ptc);
+    rent(ptc,pc,cus);
+    updaterecord(ptc,carr);
+    goto cusp;
+    break;
+    case 2:
+    rented(ptc);
+    cout<<"\n\t\t\tEnter car name which you want to return: "<<endl;
+    cin.ignore();
+    getline(cin,rcar);
+	retur(ptc,rcar)	;
+	updaterecord(ptc,carr);
+	 goto cusp;
+	break;
+    case 3:
+    system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+    outputc(ptc);
+    system("PAUSE");
+     goto cusp;
+    break;
+    case 4:	
+if(cbill!=0)
+{
+	system("CLS");
+    cheader(); 
+    cout<<endl;
+    cout<<endl;
+	cout<<"\t\t\tYour total bill of now is"<<cbill<<endl;
+	system("PAUSE");
+}
+else
+{
+cout<<"Dear Customer! You can see your total bill of now after renting  a car "<<endl;	
+system("PAUSE");	
+}
+	goto cusp;
+        break;
+    case 5:
+  cusreport(cus);
+	 goto cusp;
+	    break;
+	case 6:
+	goto login;
+	   break;
+	default:
+		cout<<"choose right option"<<endl;
+	}
+	}
+	else if(n==3)
+	{
+		
+		cout<<"\n\t\t\tYOU LEAVEd CAR RENTAL SYSTEM!!\n\t\t\t\tTHANKYOU!!"<<endl;
+	break;
+	}
+    }
+		delete []ptc;
+	}
+	
+
